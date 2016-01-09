@@ -7,4 +7,28 @@ class User < ActiveRecord::Base
                     uniqueness: { case_sensitive: false }
   has_secure_password
   has_many :microposts
+  has_many :following_relationships, class_name: "Relationship",
+                                     foreign_key: "follower_id",
+                                     dependent: :destroy
+  has_many :following_users, through: :following_relationships, source: :followed
+
+  has_many :follower_relationships, class_name: "Relationship",
+                                     foreign_key: "followed_id",
+                                     dependent: :destroy
+  has_many :follower_users, through: :follower_relationships, source: :follower
 end
+
+  #他のユーザをフォローする
+  def follow(other_user)
+    following_relationships.create(followed_id: other_user.id)
+  end
+
+  #フォローしているユーザをアンフォローする
+  def unfollow(other_user)
+    following_relationships.find_by(followed_id: other_user.id)
+  end
+
+  #あるユーザをフォローしているかどうか
+  def following?
+    following_users.include?(other_user)
+  end
