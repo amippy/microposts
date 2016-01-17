@@ -19,8 +19,9 @@ class UsersController < ApplicationController
     @user_profile.save
 
     if @user.save
+      session[:user_id] = @user.id
       flash[:success] = "Welcom to the Sample Ami's app! "
-      redirect_to @user
+      redirect_to root_path
     else
       render 'new'
     end
